@@ -56,6 +56,18 @@ Unable to negotiate with <ip> port <port>: no matching host key type found. Thei
 
 You have to append this to your ssh command : `-oHostKeyAlgorithms=+ssh-rsa`
 
+# List of compatibles arch/distro
+
+> Only AMD64 (x86_64) for the moment
+
+- Debian
+- Ubuntu
+- Centos
+- Fedora
+- Manjaro
+- Alpine
+- Archlinux
+
 ## To do
 
 - [x] : Add a random password generator
