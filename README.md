@@ -35,11 +35,11 @@ So this project is the opportunity for me to learn it and to contribute to his p
 
 ### Optional options
 
-`-a`, `--hash` : Password hash to be verified.
-`-p`, `--port` : Specify port to bind.
-`-k`, `--key` : Path to private key.
-`-i`, `--interface` : Interface to listen on.
-`-p`, `--fingerprint` : SSH Fingerprint, excluding the SSH-2.0- prefix.
+`-a`, `--hash` : Password hash to be verified.\
+`-p`, `--port` : Specify port to bind.\
+`-k`, `--key` : Path to private key.\
+`-i`, `--interface` : Interface to listen on.\
+`-p`, `--fingerprint` : SSH Fingerprint, excluding the SSH-2.0- prefix.\
 `-r`, `--rand-pass` : Generate a random password of a given length.
 
 ## Demo
